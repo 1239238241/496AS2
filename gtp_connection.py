@@ -357,9 +357,20 @@ class GtpConnection():
     def callAlphabeta(self, rootState):
         #print(rootState)
         result = self.alphabeta(rootState, -100, 100, 0)
+        if result == 1:
+            if self.board.current_player == 1:
+                print('b')
+            else:
+                print('w')
+        elif result == -1:
+            if self.board.current_player == 1:
+                print('w')
+            else:
+                print('b')
+        else:
+            print('draw')
         print(result)
     def alphabeta(self,state, alpha, beta, depth):
-        colorToPlay  = "b" if self.board.current_player == BLACK else "w"
         game_end, winner = state.check_game_end_gomoku()
         print(game_end,winner)
         if game_end or len(self.ruiqinLegalMoves()) == 0:
@@ -368,10 +379,12 @@ class GtpConnection():
             else:
                 return -1
         # print(depth,state.legalMoves(),alpha,beta)
+        colorToPlay = "b" if self.board.current_player == BLACK else "w"
         for m in self.ruiqinLegalMoves():
+            print(self.board.current_player,colorToPlay)
+            print(self.board2d())
             args = [colorToPlay.upper(),m]
             self.ruiqinSimplePlay(args)
-            print(self.board2d())
             value = -self.alphabeta(state, -beta, -alpha, depth + 1)
             #print(value)
             if value > alpha:

@@ -343,20 +343,25 @@ class SimpleGoBoard(object):
             Play a move of color on point, for the game of gomoku
             Returns boolean: whether move was legal
             """
+        print('play move' + str(self.current_player))
+
         assert is_black_white(color)
         assert point != PASS
         if self.board[point] != EMPTY:
             return False
         self.board[point] = color
         self.moves.append((point,color))
-        self.current_player = GoBoardUtil.opponent(color)
+        self.current_player = GoBoardUtil.opponent(self.current_player)
+        print('after play , current is ' + str(self.current_player))
+        print('-----------------------------------')
         return True
 
     '''Ruiqin created fucntion!!!'''
     def undoMove(self):
         tuple = self.moves.pop()
         self.board[tuple[0]] = EMPTY
-        self.current_player = GoBoardUtil.opponent(tuple[1])
+        self.current_player = GoBoardUtil.opponent(self.current_player)
+        print('after undo, current player is '+ str(self.current_player))
 
 
 
