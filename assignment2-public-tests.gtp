@@ -1,3 +1,20 @@
+clear_board
+play B B4
+play W B3
+play B C4
+play W C3
+play B D4
+play W D3
+play B E4
+play W E3
+play B F4
+solve
+
+
+
+
+
+
 #test 00, 10, ..., 100 are easy
 clear_board
 play B B4

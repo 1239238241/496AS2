@@ -49,7 +49,8 @@ class GtpConnection():
             "gogui-rules_side_to_move": self.gogui_rules_side_to_move_cmd,
             "gogui-rules_board": self.gogui_rules_board_cmd,
             "gogui-rules_final_result": self.gogui_rules_final_result_cmd,
-            "gogui-analyze_commands": self.gogui_analyze_cmd
+            "gogui-analyze_commands": self.gogui_analyze_cmd,
+            "solve": self.solve
         }
 
         # used for argument checking
@@ -99,6 +100,7 @@ class GtpConnection():
         if self.has_arg_error(command_name, len(args)):
             return
         if command_name in self.commands:
+            #print(args)
             try:
                 self.commands[command_name](args)
             except Exception as e:
@@ -346,6 +348,57 @@ class GtpConnection():
                      "pstring/Rules GameID/gogui-rules_game_id\n"
                      "pstring/Show Board/gogui-rules_board\n"
                      )
+
+    '''ruiqin created!!!'''
+    #TODO
+    def solve(self,args):
+        self.callAlphabeta(self.board)
+
+    def callAlphabeta(self, rootState):
+        #print(rootState)
+        result = self.alphabeta(rootState, -100, 100, 0)
+        print(result)
+    def alphabeta(self,state, alpha, beta, depth):
+        colorToPlay  = "b" if self.board.current_player == BLACK else "w"
+        game_end, winner = state.check_game_end_gomoku()
+        print(game_end,winner)
+        if game_end or len(self.ruiqinLegalMoves()) == 0:
+            if winner == None:
+                return 0
+            else:
+                return -1
+        # print(depth,state.legalMoves(),alpha,beta)
+        for m in self.ruiqinLegalMoves():
+            args = [colorToPlay.upper(),m]
+            self.ruiqinSimplePlay(args)
+            print(self.board2d())
+            value = -self.alphabeta(state, -beta, -alpha, depth + 1)
+            #print(value)
+            if value > alpha:
+                alpha = value
+            self.board.undoMove()
+            if value >= beta:
+                # print(depth, beta)
+                return beta  # or value in failsoft (later)
+        # print(depth,alpha,beta)
+        return alpha
+    def ruiqinLegalMoves(self):
+        game_end, _ = self.board.check_game_end_gomoku()
+        if game_end:
+            self.respond()
+            return
+        moves = GoBoardUtil.generate_legal_moves_gomoku(self.board)
+        gtp_moves = []
+        for move in moves:
+            coords = point_to_coord(move, self.board.size)
+            gtp_moves.append(format_point(coords))
+        return gtp_moves
+    def ruiqinSimplePlay(self, args):
+        board_color = args[0].lower()
+        color = color_to_int(board_color)
+        coord = move_to_coord(args[1], self.board.size)
+        move = coord_to_point(coord[0], coord[1], self.board.size)
+        self.board.play_move_gomoku(move, color)
 
 def point_to_coord(point, boardsize):
     """

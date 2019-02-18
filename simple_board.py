@@ -86,7 +86,8 @@ class SimpleGoBoard(object):
         self.liberty_of = np.full(self.maxpoint, NULLPOINT, dtype = np.int32)
         self._initialize_empty_points(self.board)
         self._initialize_neighbors()
-
+        ''''''
+        self.moves = []
     def copy(self):
         b = SimpleGoBoard(self.size)
         assert b.NS == self.NS
@@ -347,9 +348,18 @@ class SimpleGoBoard(object):
         if self.board[point] != EMPTY:
             return False
         self.board[point] = color
+        self.moves.append((point,color))
         self.current_player = GoBoardUtil.opponent(color)
         return True
-        
+
+    '''Ruiqin created fucntion!!!'''
+    def undoMove(self):
+        tuple = self.moves.pop()
+        self.board[tuple[0]] = EMPTY
+        self.current_player = GoBoardUtil.opponent(tuple[1])
+
+
+
     def _point_direction_check_connect_gomoko(self, point, shift):
         """
         Check if the point has connect5 condition in a direction
