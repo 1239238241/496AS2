@@ -375,26 +375,32 @@ class GtpConnection():
         print(game_end,winner)
         if game_end or len(self.ruiqinLegalMoves()) == 0:
             if winner == None:
-                return 0
+                return 0,None
             else:
-                return -1
+                return -1,None
         # print(depth,state.legalMoves(),alpha,beta)
         colorToPlay = "b" if self.board.current_player == BLACK else "w"
         for m in self.ruiqinLegalMoves():
-            print(self.board.current_player,colorToPlay)
+            print(self.board.current_player,colorToPlay,m)
             print(self.board2d())
             args = [colorToPlay.upper(),m]
             self.ruiqinSimplePlay(args)
-            value = -self.alphabeta(state, -beta, -alpha, depth + 1)
+            value, bestMove = self.alphabeta(state, -beta, -alpha, depth + 1)
+            value = -value
             #print(value)
             if value > alpha:
                 alpha = value
             self.board.undoMove()
             if value >= beta:
                 # print(depth, beta)
-                return beta  # or value in failsoft (later)
+                if beta == 0 and not bestMove:
+                    bestMove = m
+                return beta, bestMove  # or value in failsoft (later)
         # print(depth,alpha,beta)
-        return alpha
+        if not bestMove:
+            return alpha, np.random.choice(self.ruiqinLegalMoves())
+        else:
+            return alpha,bestMove
     def ruiqinLegalMoves(self):
         game_end, _ = self.board.check_game_end_gomoku()
         if game_end:
